@@ -1,3 +1,7 @@
+/*
+Author : Richard Young
+Date   : 6/1/2020 --
+*/
 #include <Arduino.h>
 #include <SPI.h>
 #include <PubSubClient.h>
@@ -20,24 +24,21 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print(topic);
   Serial.print("] ");
   
+  Serial.println();
+  
  for (unsigned int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
   }
   
-      
-
- if ((char)payload[0] == '0') {
-    
-    Serial.println("MQTT_STOP");
-  
+ if ((char)payload[0] == '0') {    
+    Serial.println("LIGHT_ON");
   } 
 
   if ((char)payload[0] == '1') {
-   
-    
-    Serial.println("MQTT_CLOSING");
-    
-   
+    Serial.println("LIGHT_OFF");
+  } 
+    if ((char)payload[0] == '2') {
+    Serial.println("LIGHT_OFF");
   } 
 
 }
