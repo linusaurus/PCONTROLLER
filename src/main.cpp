@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <Ethernet.h>
+#include <Automaton.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 
@@ -8,6 +9,9 @@
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xDD };
 IPAddress ip(192, 168, 10, 100);
 IPAddress server(192, 168, 10, 22);
+
+// ------------------------------------------------------------
+Atm_led led;
 
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
@@ -23,9 +27,12 @@ EthernetClient ethClient;
 PubSubClient client(ethClient);
 
 void reconnect() {
+
+   led.trigger(led.EVT_ON);
   // Loop until we're reconnected
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
+   
     // Attempt to connect
     if (client.connect("arduinoClient")) {
       Serial.println("connected");
@@ -33,6 +40,7 @@ void reconnect() {
       client.publish("outTopic","hello world");
       // ... and resubscribe
       client.subscribe("inTopic");
+      led.trigger(led.EVT_BLINK);
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -48,7 +56,7 @@ void setup() {
 
   client.setServer(server, 1883);
   client.setCallback(callback);
-
+  led.begin(LED_BUILTIN);
   Ethernet.begin(mac, ip);
   // Allow the hardware to sort itself out
   delay(1500);
